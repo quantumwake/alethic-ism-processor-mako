@@ -6,21 +6,21 @@ A component of the Alethic ISM framework that executes Mako templates. This proc
 
 The Mako Processor:
 - Renders Mako templates with input data
-- Processes input queries through user-defined Mako templates
+- Processes input items through user-defined Mako templates
 - Supports both batch processing and streaming operations
 - Provides template-based data transformation capabilities
 - Integrates with the broader ISM messaging system
 
 ## Usage
 
-To use the Mako Processor, you create a Mako template that defines how your input data should be rendered. The template receives a context with the input data under the `queries` key:
+To use the Mako Processor, you create a Mako template that defines how your input data should be rendered. The template receives a context with the input data under the `items` key:
 
 ```mako
 ## Mako template to process input data
 <%
     import json
 %>
-% for query in queries:
+% for query in items:
     ${json.dumps(query)}
 % endfor
 ```
@@ -29,28 +29,28 @@ To use the Mako Processor, you create a Mako template that defines how your inpu
 
 ### Example 1: Basic Data Processing
 
-This example demonstrates processing input queries and formatting the output:
+This example demonstrates processing input items and formatting the output:
 
 ```mako
 <%
     import json
 %>
-% for i, query in enumerate(queries):
+% for i, query in enumerate(items):
     Query ${i + 1}: ${json.dumps(query, indent=2)}
 % endfor
 ```
 
 ### Example 2: JSON Output Generation
 
-This example shows how to generate JSON output from input queries:
+This example shows how to generate JSON output from input items:
 
 ```mako
 <%
     import json
     
-    # Process all queries and create output
+    # Process all items and create output
     output = []
-    for query in queries:
+    for query in items:
         result = {
             'processed': True,
             'original_data': query
@@ -62,7 +62,7 @@ ${json.dumps(output, indent=2)}
 
 ### Example 3: HTML Table Generation
 
-A simple example that generates an HTML table from input queries:
+A simple example that generates an HTML table from input items:
 
 ```mako
 <table>
@@ -73,7 +73,7 @@ A simple example that generates an HTML table from input queries:
         </tr>
     </thead>
     <tbody>
-% for i, query in enumerate(queries):
+% for i, query in enumerate(items):
         <tr>
             <td>${i + 1}</td>
             <td>${query}</td>
@@ -92,9 +92,9 @@ This example demonstrates a more complex Mako template with data transformation:
     import json
     from datetime import datetime
     
-    # Transform queries
+    # Transform items
     transformed_data = []
-    for query in queries:
+    for query in items:
         item = {
             'timestamp': datetime.now().isoformat(),
             'query_id': query.get('id', 'unknown'),
@@ -118,8 +118,10 @@ This example demonstrates a more complex Mako template with data transformation:
 
 The Mako Processor uses the Mako templating engine to transform input data:
 
-- Templates receive input data in the `queries` context variable
-- Full Python expressions are available within template blocks
+
+- *Templates receive input data in the `items` context variable (if the input values is a list of dictionaries)
+- *Templates receive input data in the context variable (if the input values is a dictionary)
+- Full Mako expressions are available within template blocks
 - Output is generated through template rendering
 - Templates can generate any text-based format (JSON, HTML, XML, etc.)
 - The `build_template_text_v2` utility function handles the template rendering

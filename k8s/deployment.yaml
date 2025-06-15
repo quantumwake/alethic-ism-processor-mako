@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alethic-ism-processor-mako-deployment
+  namespace: alethic
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: alethic-ism-processor-mako
+  template:
+    metadata:
+      labels:
+        app: alethic-ism-processor-mako
+    spec:
+      volumes:
+        - name: alethic-ism-routes-secret-volume
+          secret:
+            secretName: alethic-ism-routes-secret
+            items:
+              - key: .routing.yaml
+                path: .routing.yaml
+      containers:
+      - name: alethic-ism-processor-mako
+        image: <IMAGE>
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: alethic-ism-routes-secret-volume
+            mountPath: /app/repo/.routing.yaml
+            subPath: .routing.yaml
+            readOnly: true
+        env:
+          # Log Level
+          - name: LOG_LEVEL
+            valueFrom:
+              secretKeyRef:
+                name: alethic-ism-processor-mako-secret
+                key: LOG_LEVEL
+
+          # Consumer Configuration
+          - name: ROUTING_FILE
+            valueFrom:
+              secretKeyRef:
+                name: alethic-ism-processor-mako-secret
+                key: ROUTING_FILE
+
+          # Database connection details
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: alethic-ism-processor-mako-secret
+                key: DATABASE_URL
+
+      imagePullSecrets:
+      - name: regcred
